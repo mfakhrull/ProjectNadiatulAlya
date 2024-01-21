@@ -1,0 +1,59 @@
+body {
+    font: 12px "Lucida Sans Unicode", Verdana, sans-serif;
+    color: #333333;
+    background: #FFF;
+    margin: 0;
+    padding: 0;
+}
+
+#wrapper {
+    margin: 0 auto;
+    max-width: 800px; /* Change width to max-width for responsiveness */
+}
+
+#content {
+    margin: 0 25px;
+    padding: 10px;
+}
+
+#content p {
+    margin: 0 130px 6px 0;
+    text-align: justify;
+}
+
+#nav {
+    background-color: #f0f0f0;
+    overflow: hidden;
+}
+
+#nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#nav ul li {
+    float: left; /* Float the list items to create a horizontal layout */
+}
+
+#nav ul li a {
+    text-decoration: none;
+    color: #333;
+    padding: 10px;
+    display: block;
+}
+
+/* Style for navigation links on hover */
+#nav ul li a:hover {
+    background-color: #ddd;
+}
+
+#footer {
+    border-top: 1px solid #000;
+    margin: 0 25px;
+    padding: 10px;
+}
+
+.error {
+    color: #FF0033;
+}
