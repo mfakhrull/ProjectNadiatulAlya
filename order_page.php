@@ -40,26 +40,27 @@ if (isset($_POST['submitted'])) {
 
         $all_orders_success = true;
 
-        function getProductDetails($dbc, $product_name) {
+        function getProductDetails($dbc, $product_name)
+        {
             // Prepare the query to get the price and discount
             $query = "SELECT price, discount FROM products WHERE product_name = ?";
             $stmt = mysqli_prepare($dbc, $query);
-        
+
             // Bind the parameter
             mysqli_stmt_bind_param($stmt, "s", $product_name);
-        
+
             // Execute the query
             mysqli_stmt_execute($stmt);
-        
+
             // Bind the result variables
             mysqli_stmt_bind_result($stmt, $price, $discount);
-        
+
             // Fetch the result
             $result = mysqli_stmt_fetch($stmt);
-        
+
             // Close the statement
             mysqli_stmt_close($stmt);
-        
+
             // If the fetch was successful, return the price and discount
             if ($result) {
                 return ['price' => $price, 'discount' => $discount];
@@ -67,25 +68,25 @@ if (isset($_POST['submitted'])) {
                 return null; // Or handle the error as appropriate
             }
         }
-        
+
 
         // Get the selected products and quantities
         foreach ($_POST['products'] as $product_name => $selected) {
             if ($selected == 1 && isset($_POST['quantity'][$product_name])) {
                 $quantity = $_POST['quantity'][$product_name];
                 $productDetails = getProductDetails($dbc, $product_name);
-        
+
                 if ($productDetails !== null) {
                     // Calculate the total sales amount for this product and quantity after discount
                     $discountedPrice = $productDetails['price'] - ($productDetails['price'] * $productDetails['discount'] / 100);
                     $total_sales = $discountedPrice * $quantity;
 
                     // Use prepared statement to insert the order into the database
-                    $query = "INSERT INTO orders (customer_name, address, contact_number, product_name, quantity) VALUES (?, ?, ?, ?, ?)";
+                    $query = "INSERT INTO orders (user_id, customer_name, address, contact_number, product_name, quantity, order_status) VALUES (?, ?, ?, ?, ?, ?, 'Pending')";
                     $stmt = mysqli_prepare($dbc, $query);
 
-                    // Bind parameters
-                    mysqli_stmt_bind_param($stmt, "ssssi", $customer_name, $address, $contact_number, $product_name, $quantity);
+                    // Bind parameters, including the user_id from the session
+                    mysqli_stmt_bind_param($stmt, "sssssi", $_SESSION['user_id'], $customer_name, $address, $contact_number, $product_name, $quantity);
 
                     // Execute the query
                     $result = mysqli_stmt_execute($stmt);
@@ -94,11 +95,11 @@ if (isset($_POST['submitted'])) {
                     mysqli_stmt_close($stmt);
 
                     // Now, insert the sales data into the sales table
-                    $sales_query = "INSERT INTO sales (user_id, total_sales, units_sold) VALUES (?, ?, ?)";
-                    $sales_stmt = mysqli_prepare($dbc, $sales_query);
-                    mysqli_stmt_bind_param($sales_stmt, "sii", $_SESSION['user_id'], $total_sales, $quantity); // Assuming you have the agent's user_id stored in session
-                    $sales_result = mysqli_stmt_execute($sales_stmt);
-                    mysqli_stmt_close($sales_stmt);
+                    // $sales_query = "INSERT INTO sales (user_id, total_sales, units_sold) VALUES (?, ?, ?)";
+                    // $sales_stmt = mysqli_prepare($dbc, $sales_query);
+                    // mysqli_stmt_bind_param($sales_stmt, "sii", $_SESSION['user_id'], $total_sales, $quantity); // Assuming you have the agent's user_id stored in session
+                    // $sales_result = mysqli_stmt_execute($sales_stmt);
+                    // mysqli_stmt_close($sales_stmt);
                 } else {
                     // Handle the case where price or discount is not found
                     $all_orders_success = false;
